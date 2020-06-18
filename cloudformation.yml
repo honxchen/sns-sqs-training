@@ -17,6 +17,25 @@ Resources:
     Properties:
       TopicName: "hongxingTopic"
 
+
+  SNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref MessageSNSTopic
+      PolicyDocument:
+        Id: MyTopicPolicy
+        Version: '2012-10-17'
+        Statement:
+          - Sid: allow-cloudwatch-rule-public
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - sns:Subscribe
+              - sns:Publish
+            Resource: !Ref MessageSNSTopic
+
+
   SNSSubscription:
     Type: 'AWS::SNS::Subscription'
     Properties:
