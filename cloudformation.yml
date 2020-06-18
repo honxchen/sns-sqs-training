@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "This template will deploy this job."
+
+Resources:
+  ScheduledRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "ScheduledRule"
+      ScheduleExpression: "rate(5 minutes)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !Ref MessageSNSTopic
+          Id: "TargetSns"
+
+  MessageSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: "hongxingTopic"
+
+  SNSSubscription:
+    Type: 'AWS::SNS::Subscription'
+    Properties:
+      TopicArn: !Ref MessageSNSTopic
+      Endpoint: !GetAtt MessageQueue.Arn
+      Protocol: sqs
+
+  MessageQueue:
+    Type: AWS::SQS::Queue
+    DependsOn: DeadLetterQueue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
