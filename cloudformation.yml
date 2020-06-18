@@ -60,5 +60,39 @@ Resources:
         deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
         maxReceiveCount: 5
 
+  SQSPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref MessageQueue
+      PolicyDocument:
+        Statement:
+          - Action:
+              - SQS:SendMessage
+              - SQS:ReceiveMessage
+            Effect: Allow
+            Resource: !Ref MessageQueue
+            Principal: '*'
+
   DeadLetterQueue:
     Type: AWS::SQS::Queue
+
+  LambdaFunctionHello:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: com.xing.SqsRequestHandler
+      Role: arn:aws:iam::494526681395:role/for-aws-training-2
+      Code:
+        S3Bucket: hongxing-deployment-bucket
+        S3Key: func/v1/sns-sqs-training-1.0-SNAPSHOT.jar
+      Runtime: java8
+      Timeout: 60
+      MemorySize: 512
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref LambdaFunctionHello
+      Principal: sqs.amazonaws.com
+      SourceArn: !GetAtt MessageQueue.Arn
