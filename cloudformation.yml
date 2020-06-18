@@ -24,10 +24,19 @@ Resources:
       Endpoint: !GetAtt MessageQueue.Arn
       Protocol: sqs
 
+  EmailSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: 921261636@qq.com
+      Protocol: email
+      TopicArn: !Ref 'MessageSNSTopic'
+
   MessageQueue:
     Type: AWS::SQS::Queue
     DependsOn: DeadLetterQueue
     Properties:
+      MessageRetentionPeriod: 604800
+      VisibilityTimeout: 300
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
         maxReceiveCount: 5
