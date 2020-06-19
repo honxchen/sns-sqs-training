@@ -104,3 +104,11 @@ Resources:
       FunctionName: !Ref LambdaFunctionHello
       Principal: sqs.amazonaws.com
       SourceArn: !GetAtt MessageQueue.Arn
+
+  LambdaSQSMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !GetAtt MessageQueue.Arn
+      FunctionName: !GetAtt LambdaFunctionHello.Arn
