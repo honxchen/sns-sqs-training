@@ -67,12 +67,20 @@ Resources:
         - !Ref MessageQueue
       PolicyDocument:
         Statement:
-          - Action:
-              - SQS:SendMessage
-              - SQS:ReceiveMessage
+          - Sid: allow-send-message
             Effect: Allow
+            Principal:
+              AWS: "*"
+            Action:
+              - SQS:SendMessage
             Resource: !Ref MessageQueue
-            Principal: '*'
+          - Sid: Allow-receive-SendMessage
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Action:
+              - sqs:ReceiveMessage
+            Resource: !GetAtt LambdaFunctionHello.Arn
 
   DeadLetterQueue:
     Type: AWS::SQS::Queue
