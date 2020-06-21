@@ -16,6 +16,10 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: "hongxingTopic"
+      KmsMasterKeyId: d9e54010-f4dd-4f45-8bec-75cbc6b034d9
+      Tags:
+        - Key: "user"
+          Value: "hongxing"
 
 
   SNSTopicPolicy:
@@ -42,6 +46,8 @@ Resources:
       TopicArn: !Ref MessageSNSTopic
       Endpoint: !GetAtt MessageQueue.Arn
       Protocol: sqs
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
 
   EmailSubscription:
     Type: AWS::SNS::Subscription
@@ -49,6 +55,8 @@ Resources:
       Endpoint: 921261636@qq.com
       Protocol: email
       TopicArn: !Ref 'MessageSNSTopic'
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
 
   MessageQueue:
     Type: AWS::SQS::Queue
@@ -56,6 +64,7 @@ Resources:
     Properties:
       MessageRetentionPeriod: 604800
       VisibilityTimeout: 300
+      KmsMasterKeyId: d9e54010-f4dd-4f45-8bec-75cbc6b034d9
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
         maxReceiveCount: 5
@@ -65,6 +74,7 @@ Resources:
     Properties:
       Queues:
         - !Ref MessageQueue
+        - !Ref DeadLetterQueue
       PolicyDocument:
         Statement:
           - Sid: allow-send-message
