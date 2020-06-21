@@ -6,7 +6,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: "ScheduledRule"
-      ScheduleExpression: "rate(5 minutes)"
+      ScheduleExpression: "rate(1 minute)"
       State: "ENABLED"
       Targets:
         - Arn: !Ref MessageSNSTopic
@@ -73,14 +73,8 @@ Resources:
               AWS: "*"
             Action:
               - SQS:SendMessage
-            Resource: !Ref MessageQueue
-          - Sid: Allow-receive-SendMessage
-            Effect: Allow
-            Principal:
-              AWS: "*"
-            Action:
-              - sqs:ReceiveMessage
-            Resource: !GetAtt LambdaFunctionHello.Arn
+              - SQS:ReceiveMessage
+            Resource: '*'
 
   DeadLetterQueue:
     Type: AWS::SQS::Queue
