@@ -10,6 +10,7 @@ Resources:
       State: "ENABLED"
       Targets:
         - Arn: !Ref MessageSNSTopic
+          Input: "{\"text\":\"from cloudwatch\"}"
           Id: "TargetSns"
 
   MessageSNSTopic:
